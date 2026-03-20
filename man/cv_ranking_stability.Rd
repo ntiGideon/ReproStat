@@ -77,6 +77,7 @@ across repetitions.  Supports four modeling backends: \code{"lm"},
 \code{"glmnet"} (penalized regression via \pkg{glmnet}).
 }
 \examples{
+\donttest{
 # Linear models
 models <- list(m1 = mpg ~ wt + hp, m2 = mpg ~ wt + hp + disp)
 cv_ranking_stability(models, mtcars, v = 5, R = 20)
@@ -95,6 +96,7 @@ if (requireNamespace("MASS", quietly = TRUE)) {
 if (requireNamespace("glmnet", quietly = TRUE)) {
   lasso_models <- list(m1 = mpg ~ wt + hp, m2 = mpg ~ wt + hp + disp + qsec)
   cv_ranking_stability(lasso_models, mtcars, v = 5, R = 20, backend = "glmnet")
+}
 }
 
 }

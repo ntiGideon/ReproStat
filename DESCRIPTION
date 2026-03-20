@@ -13,7 +13,7 @@ Description: Tools for diagnosing the reproducibility of statistical model
     cross-validation ranking stability for model comparison and visualization
     utilities. Optional backends support robust M-estimation ('MASS') and
     penalized regression ('glmnet').
-License: GPL (>= 3) + file LICENSE
+License: GPL (>= 3)
 Encoding: UTF-8
 RoxygenNote: 7.3.2
 Config/testthat/edition: 3

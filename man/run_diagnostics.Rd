@@ -93,10 +93,11 @@ penalized regression (\code{"glmnet"} via \pkg{glmnet}).
 }
 \examples{
 set.seed(1)
-# Linear model
-diag_lm <- run_diagnostics(mpg ~ wt + hp, data = mtcars, B = 50)
+# Linear model (small B for a quick check)
+diag_lm <- run_diagnostics(mpg ~ wt + hp, data = mtcars, B = 20)
 print(diag_lm)
 
+\donttest{
 # Logistic regression
 diag_glm <- run_diagnostics(am ~ wt + hp + qsec, data = mtcars, B = 50,
                             family = stats::binomial())
@@ -114,6 +115,7 @@ if (requireNamespace("glmnet", quietly = TRUE)) {
   diag_glmnet <- run_diagnostics(mpg ~ wt + hp + disp + qsec, data = mtcars,
                                  B = 50, backend = "glmnet", en_alpha = 1)
   reproducibility_index(diag_glmnet)
+}
 }
 
 }

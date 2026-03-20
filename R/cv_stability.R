@@ -48,6 +48,7 @@
 #'   }
 #'
 #' @examples
+#' \donttest{
 #' # Linear models
 #' models <- list(m1 = mpg ~ wt + hp, m2 = mpg ~ wt + hp + disp)
 #' cv_ranking_stability(models, mtcars, v = 5, R = 20)
@@ -66,6 +67,7 @@
 #' if (requireNamespace("glmnet", quietly = TRUE)) {
 #'   lasso_models <- list(m1 = mpg ~ wt + hp, m2 = mpg ~ wt + hp + disp + qsec)
 #'   cv_ranking_stability(lasso_models, mtcars, v = 5, R = 20, backend = "glmnet")
+#' }
 #' }
 #'
 #' @importFrom stats lm glm predict model.frame model.response sd model.matrix
