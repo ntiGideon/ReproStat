@@ -1,0 +1,5 @@
+"scenario","n","noise","rho","RI","CI_lower","CI_upper","coef_component","pvalue_component","selection_component","prediction_component"
+"baseline",200,1,0.2,99.69,99.63,99.75,0.989,1,1,0.999
+"small_sample",40,1,0.2,98.26,97.24,99.1,0.983,0.98,0.973,0.994
+"multicollinearity",200,1,0.98,85.66,85.08,88.21,0.987,0.76,0.68,0.999
+"high_noise",200,3,0.2,85.64,85.07,88.19,0.989,0.76,0.68,0.997

@@ -1,0 +1,13 @@
+=== Cross-dataset RI Summary === 
+
+       dataset                     model        method   B    RI CI_lower
+1  mtcars (lm)          mpg ~ wt+hp+disp     bootstrap 150 88.33    85.31
+2 mtcars (glm)           am ~ wt+hp+qsec     bootstrap 150 74.76    74.04
+3         iris          Sepal.Length ~ . noise sd=0.03 150 99.98    99.98
+4   airquality Ozone ~ Solar.R+Wind+Temp     bootstrap 150 83.58    81.49
+  CI_upper
+1    91.35
+2    75.73
+3    99.98
+4    85.58
+

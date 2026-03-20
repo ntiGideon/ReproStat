@@ -1,0 +1,29 @@
+=== mtcars GLM: am ~ wt + hp + qsec | logistic bootstrap B=150 === 
+
+--- Coefficient Stability --- 
+
+ (Intercept)           wt           hp         qsec 
+865790.27302   5200.88676      0.84213   1473.11121 
+
+--- P-value Stability --- 
+
+(Intercept)          wt          hp        qsec 
+          0           0           0           0 
+
+--- Selection Stability --- 
+
+  wt   hp qsec 
+   0    0    0 
+
+--- Reproducibility Index --- 
+
+RI: 74.76 / 100 
+
+      coef     pvalue  selection prediction 
+    0.0920     1.0000     1.0000     0.8983 
+
+--- 95% Bootstrap CI for RI (R=400) --- 
+
+ 2.5% 97.5% 
+74.04 75.73 
+

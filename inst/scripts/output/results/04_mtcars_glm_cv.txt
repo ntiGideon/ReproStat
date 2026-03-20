@@ -1,0 +1,7 @@
+=== mtcars GLM: CV Ranking (log-loss) | v=5, R=30 === 
+
+     model mean_rmse    sd_rmse mean_rank top1_frequency
+1 expanded 0.6639230 0.43679999  1.333333      0.7333333
+2  compact 0.7433642 0.09660459  1.733333      0.2666667
+3 baseline 1.6481643 0.28424983  2.933333      0.0000000
+

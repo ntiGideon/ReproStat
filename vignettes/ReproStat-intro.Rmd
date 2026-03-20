@@ -1,0 +1,183 @@
+---
+title: "Introduction to ReproStat"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to ReproStat}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment  = "#>",
+  fig.width  = 7,
+  fig.height = 4
+)
+set.seed(20260307)
+library(ReproStat)
+```
+
+## Overview
+
+**ReproStat** provides tools for diagnosing the reproducibility of statistical
+modeling workflows. The central idea is to perturb the data in small ways
+(bootstrap, subsampling, or noise) and measure how much model outputs change
+across perturbations. Stable outputs imply high reproducibility; volatile
+outputs flag potential concerns.
+
+The package computes:
+
+- **Coefficient stability** – variance of estimates across perturbations.
+- **P-value stability** – frequency of significant findings.
+- **Selection stability** – frequency of variable selection.
+- **Prediction stability** – variance of predictions.
+- **Reproducibility Index (RI)** – a composite 0–100 score.
+
+## Basic workflow
+
+### Step 1: Run diagnostics
+
+```{r run-diag}
+mt_diag <- run_diagnostics(
+  mpg ~ wt + hp + disp,
+  data   = mtcars,
+  B      = 200,
+  method = "bootstrap"
+)
+mt_diag
+```
+
+### Step 2: Inspect individual metrics
+
+```{r metrics}
+coef_stability(mt_diag)
+pvalue_stability(mt_diag)
+selection_stability(mt_diag)
+prediction_stability(mt_diag)$mean_variance
+```
+
+### Step 3: Compute the reproducibility index
+
+```{r ri}
+reproducibility_index(mt_diag)
+```
+
+### Step 4: Visualise
+
+```{r plots}
+par(mfrow = c(1, 2))
+plot_stability(mt_diag, "coefficient")
+plot_stability(mt_diag, "selection")
+par(mfrow = c(1, 1))
+```
+
+## Perturbation methods
+
+Three perturbation strategies are supported:
+
+```{r methods, eval = FALSE}
+# Bootstrap resampling (default)
+run_diagnostics(mpg ~ wt + hp, mtcars, method = "bootstrap")
+
+# Subsampling (80 % of rows without replacement)
+run_diagnostics(mpg ~ wt + hp, mtcars, method = "subsample", frac = 0.8)
+
+# Gaussian noise injection (5 % of each column's SD)
+run_diagnostics(mpg ~ wt + hp, mtcars, method = "noise", noise_sd = 0.05)
+```
+
+## Model comparison with CV ranking stability
+
+Use `cv_ranking_stability()` to compare multiple candidate models across
+repeated cross-validation runs.
+
+```{r cv}
+models <- list(
+  baseline = mpg ~ wt + hp + disp,
+  compact  = mpg ~ wt + hp,
+  expanded = mpg ~ wt + hp + disp + qsec
+)
+
+cv_result <- cv_ranking_stability(models, mtcars, v = 5, R = 40)
+cv_result$summary
+```
+
+```{r cv-plot}
+plot_cv_stability(cv_result, metric = "top1_frequency")
+```
+
+## Working with other datasets
+
+The package is dataset-agnostic. Any data frame with a numeric response and
+numeric predictors works:
+
+```{r iris-example}
+iris_diag <- run_diagnostics(
+  Sepal.Length ~ Sepal.Width + Petal.Length + Petal.Width,
+  data   = iris,
+  B      = 150,
+  method = "noise",
+  noise_sd = 0.03
+)
+reproducibility_index(iris_diag)
+```
+
+For datasets with missing values, subset to complete cases first:
+
+```{r airquality-example}
+aq <- na.omit(airquality[, c("Ozone", "Solar.R", "Wind", "Temp")])
+aq_diag <- run_diagnostics(
+  Ozone ~ Solar.R + Wind + Temp,
+  data   = aq,
+  B      = 150,
+  method = "bootstrap"
+)
+reproducibility_index(aq_diag)
+```
+
+## Uncertainty in the RI: bootstrap confidence interval
+
+`ri_confidence_interval()` resamples the stored perturbation draws to
+estimate uncertainty in the RI without refitting any models.
+
+```{r ci}
+set.seed(20260307)
+d <- run_diagnostics(mpg ~ wt + hp + disp, mtcars, B = 150)
+ri_confidence_interval(d, level = 0.95, R = 500)
+```
+
+## Modeling backends
+
+ReproStat supports four backends.  All use the same API; only the
+`backend` argument changes.
+
+```{r backends, eval = FALSE}
+# Generalized linear model (logistic)
+run_diagnostics(am ~ wt + hp, mtcars, B = 100,
+                family = stats::binomial())
+
+# Robust regression (requires MASS)
+if (requireNamespace("MASS", quietly = TRUE))
+  run_diagnostics(mpg ~ wt + hp, mtcars, B = 100, backend = "rlm")
+
+# LASSO (requires glmnet)
+if (requireNamespace("glmnet", quietly = TRUE))
+  run_diagnostics(mpg ~ wt + hp + disp + qsec, mtcars,
+                  B = 100, backend = "glmnet", en_alpha = 1)
+```
+
+## ggplot2 helpers
+
+If **ggplot2** is installed, `plot_stability_gg()` and
+`plot_cv_stability_gg()` return `ggplot` objects that can be further
+customised.
+
+```{r ggplot-helpers, eval = requireNamespace("ggplot2", quietly = TRUE)}
+if (requireNamespace("ggplot2", quietly = TRUE)) {
+  set.seed(1)
+  d_gg <- run_diagnostics(mpg ~ wt + hp + disp, mtcars, B = 50)
+  print(plot_stability_gg(d_gg, "coefficient"))
+  print(plot_stability_gg(d_gg, "selection"))
+}
+```
