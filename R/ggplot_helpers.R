@@ -14,10 +14,12 @@ utils::globalVariables(c("term", "value", "model"))
 #' @return A \code{ggplot} object.
 #'
 #' @examples
-#' \dontrun{
-#' d <- run_diagnostics(mpg ~ wt + hp, mtcars, B = 50)
-#' plot_stability_gg(d, "coefficient")
-#' plot_stability_gg(d, "selection")
+#' \donttest{
+#' if (requireNamespace("ggplot2", quietly = TRUE)) {
+#'   d <- run_diagnostics(mpg ~ wt + hp, mtcars, B = 50)
+#'   plot_stability_gg(d, "coefficient")
+#'   plot_stability_gg(d, "selection")
+#' }
 #' }
 #'
 #' @importFrom stats reorder
@@ -64,11 +66,13 @@ plot_stability_gg <- function(diag_obj,
 #' @return A \code{ggplot} object.
 #'
 #' @examples
-#' \dontrun{
-#' models <- list(m1 = mpg ~ wt + hp, m2 = mpg ~ wt + hp + disp)
-#' cv <- cv_ranking_stability(models, mtcars, v = 5, R = 20)
-#' plot_cv_stability_gg(cv, "top1_frequency")
-#' plot_cv_stability_gg(cv, "mean_rank")
+#' \donttest{
+#' if (requireNamespace("ggplot2", quietly = TRUE)) {
+#'   models <- list(m1 = mpg ~ wt + hp, m2 = mpg ~ wt + hp + disp)
+#'   cv <- cv_ranking_stability(models, mtcars, v = 5, R = 20)
+#'   plot_cv_stability_gg(cv, "top1_frequency")
+#'   plot_cv_stability_gg(cv, "mean_rank")
+#' }
 #' }
 #'
 #' @importFrom stats reorder

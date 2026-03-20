@@ -1,0 +1,9 @@
+pandoc: 3.6.3
+pkgdown: 2.1.1
+pkgdown_sha: ~
+articles:
+  ReproStat-intro: ReproStat-intro.html
+last_built: 2026-03-20T20:35Z
+urls:
+  reference: https://ntiGideon.github.io/ReproStat/reference
+  article: https://ntiGideon.github.io/ReproStat/articles
