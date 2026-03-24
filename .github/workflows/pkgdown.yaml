@@ -34,6 +34,7 @@ jobs:
             any::MASS
             any::glmnet
             any::ggplot2
+            local::.
           needs: website
 
       - name: Build pkgdown site
