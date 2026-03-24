@@ -8,10 +8,10 @@ ReproStat evaluates how stable a fitted model's outputs (coefficients, p-values,
 
 ## Installation
 
-### From source (local)
 
 ```r
-devtools::install("ReproStat")
+# install.packages("devtools")
+devtools::install_github("ntiGideon/ReproStat")
 ```
 
 ### Optional dependencies
