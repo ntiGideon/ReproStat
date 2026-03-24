@@ -1,7 +1,10 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://ntiGideon.github.io/ReproStat/404.html</loc></url>
 <url><loc>https://ntiGideon.github.io/ReproStat/articles/ReproStat-intro.html</loc></url>
+<url><loc>https://ntiGideon.github.io/ReproStat/articles/backend-guide.html</loc></url>
 <url><loc>https://ntiGideon.github.io/ReproStat/articles/index.html</loc></url>
+<url><loc>https://ntiGideon.github.io/ReproStat/articles/interpreting-reprostat.html</loc></url>
+<url><loc>https://ntiGideon.github.io/ReproStat/articles/workflow-patterns.html</loc></url>
 <url><loc>https://ntiGideon.github.io/ReproStat/authors.html</loc></url>
 <url><loc>https://ntiGideon.github.io/ReproStat/index.html</loc></url>
 <url><loc>https://ntiGideon.github.io/ReproStat/news/index.html</loc></url>

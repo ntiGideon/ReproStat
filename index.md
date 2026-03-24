@@ -2,395 +2,355 @@
 
 **Reproducibility Diagnostics for Statistical Modeling**
 
-ReproStat evaluates how stable a fitted model’s outputs (coefficients,
-p-values, variable selection, predictions) are under data perturbations.
-It reports four stability metrics and aggregates them into a single
-**Reproducibility Index (RI)** on a 0–100 scale.
+ReproStat helps you answer a practical question that standard model
+summaries do not answer well:
+
+**If the data changed a little, would the substantive result still look
+the same?**
+
+The package repeatedly perturbs a dataset, refits the model, and
+measures how stable the outputs remain. It summarizes that behavior
+through:
+
+- coefficient stability
+- p-value stability
+- selection stability
+- prediction stability
+- a composite **Reproducibility Index (RI)** on a 0-100 scale
+- cross-validation ranking stability for comparing multiple candidate
+  models
+
+This makes ReproStat useful when you want to move beyond single-fit
+inference and assess how sensitive your modeling conclusions are to
+ordinary data variation.
+
+------------------------------------------------------------------------
+
+## What ReproStat Is For
+
+ReproStat is designed for analysts who want to know whether a model
+result is:
+
+- stable under bootstrap resampling
+- sensitive to sample composition
+- sensitive to small measurement noise
+- robust across competing modeling choices
+
+Typical use cases include:
+
+- regression diagnostics for research analyses
+- checking whether selected predictors remain important across
+  perturbations
+- comparing candidate models by how consistently they rank best in
+  repeated CV
+- producing a transparent reproducibility summary for reports, theses,
+  or papers
+
+ReproStat does **not** claim to prove scientific reproducibility on its
+own. It quantifies the stability of model outputs under controlled
+perturbation schemes so you can assess how fragile or dependable the
+modeling result appears.
 
 ------------------------------------------------------------------------
 
 ## Installation
 
+If the package is available on CRAN:
+
 ``` r
-devtools::install("ReproStat")
+install.packages("ReproStat")
+```
+
+To install the development version from GitHub:
+
+``` r
+remotes::install_github("ntiGideon/ReproStat")
 ```
 
 ### Optional dependencies
 
-| Package   | Purpose                                             |
-|-----------|-----------------------------------------------------|
-| `MASS`    | Robust M-estimation backend (`backend = "rlm"`)     |
-| `glmnet`  | Penalized regression backend (`backend = "glmnet"`) |
-| `ggplot2` | Enhanced ggplot-based visualisations                |
+| Package   | Purpose                                               |
+|-----------|-------------------------------------------------------|
+| `MASS`    | Robust M-estimation backend via `backend = "rlm"`     |
+| `glmnet`  | Penalized regression backend via `backend = "glmnet"` |
+| `ggplot2` | ggplot-based plotting helpers                         |
 
 ------------------------------------------------------------------------
 
-## Quick start
+## Core Idea
+
+The package follows a simple workflow:
+
+``` text
+original data
+    ->
+perturb data many times
+    ->
+refit the model each time
+    ->
+measure how much results change
+    ->
+summarize the stability of those changes
+```
+
+If coefficient signs, significance decisions, selected variables,
+predictions, and model rankings remain similar across perturbations, the
+analysis is more reproducible in the sense ReproStat measures. If they
+vary substantially, the result may be fragile.
+
+------------------------------------------------------------------------
+
+## Quick Start
 
 ``` r
 library(ReproStat)
 
 set.seed(1)
-diag <- run_diagnostics(mpg ~ wt + hp, data = mtcars, B = 200)
 
-# Composite reproducibility index
-reproducibility_index(diag)
-#> $index
-#> [1] 74.3
-#>
-#> $components
-#>      coef    pvalue selection prediction
-#>    0.8021    0.7154    0.7412     0.6821
+diag_obj <- run_diagnostics(
+  mpg ~ wt + hp + disp,
+  data = mtcars,
+  B = 200,
+  method = "bootstrap"
+)
 
-# Confidence interval for the RI
-ri_confidence_interval(diag, R = 500)
+print(diag_obj)
+coef_stability(diag_obj)
+pvalue_stability(diag_obj)
+selection_stability(diag_obj)
+prediction_stability(diag_obj)
+reproducibility_index(diag_obj)
+ri_confidence_interval(diag_obj, R = 500, seed = 1)
 ```
 
 ------------------------------------------------------------------------
 
-## Core workflow
+## Main Workflow
 
-    perturb_data()       (optional, standalone use)
-           |
-    run_diagnostics()    <-- main entry point
-           |
-       reprostat object
-           |
-       ┌───┴────────────────────────────────────┐
-       │                                        │
-    stability metrics                  reproducibility_index()
-    coef_stability()                         │
-    pvalue_stability()               ri_confidence_interval()
-    selection_stability()
-    prediction_stability()
-       │
-    plot_stability()
-    cv_ranking_stability() / plot_cv_stability()
+### 1. Fit the diagnostic object
 
-------------------------------------------------------------------------
-
-## Functions
-
-### `perturb_data()`
-
-Generates a single perturbed copy of a data frame.
+[`run_diagnostics()`](https://ntiGideon.github.io/ReproStat/reference/run_diagnostics.md)
+is the main entry point. It fits the original model, perturbs the data
+`B` times, refits the model, and stores the results for downstream
+summaries.
 
 ``` r
-perturb_data(data, method = "bootstrap", frac = 0.8, noise_sd = 0.05)
-```
-
-| `method`      | Description                                          |
-|---------------|------------------------------------------------------|
-| `"bootstrap"` | Resample *n* rows with replacement (default)         |
-| `"subsample"` | Draw `floor(frac * n)` rows without replacement      |
-| `"noise"`     | Add Gaussian noise scaled to `noise_sd * sd(column)` |
-
-``` r
-set.seed(1)
-d_boot <- perturb_data(mtcars, method = "bootstrap")
-d_sub  <- perturb_data(mtcars, method = "subsample", frac = 0.7)
-d_nois <- perturb_data(mtcars, method = "noise",     noise_sd = 0.1)
-```
-
-------------------------------------------------------------------------
-
-### `run_diagnostics()`
-
-Fits a base model and re-fits it on `B` perturbed datasets, collecting
-coefficient estimates, p-values, and predictions across iterations.
-
-``` r
-run_diagnostics(
-  formula,
-  data,
-  B           = 200,
-  method      = c("bootstrap", "subsample", "noise"),
-  alpha       = 0.05,
-  frac        = 0.8,
-  noise_sd    = 0.05,
-  predict_newdata = NULL,
-  family      = NULL,
-  backend     = c("lm", "glm", "rlm", "glmnet"),
-  en_alpha    = 1,
-  lambda      = NULL
+diag_obj <- run_diagnostics(
+  mpg ~ wt + hp + disp,
+  data = mtcars,
+  B = 200,
+  method = "bootstrap"
 )
 ```
 
-**Backends:**
-
-| `backend`  | Model type                                         | Extra dependency |
-|------------|----------------------------------------------------|------------------|
-| `"lm"`     | Ordinary least squares                             | —                |
-| `"glm"`    | Generalized linear model                           | —                |
-| `"rlm"`    | Robust M-estimation                                | `MASS`           |
-| `"glmnet"` | Penalized regression (LASSO / ridge / elastic net) | `glmnet`         |
-
-**Returns** an S3 object of class `"reprostat"` containing `coef_mat` (B
-× p), `p_mat` (B × p), `pred_mat` (n × B), `base_fit`, `y_train`, and
-metadata.
+### 2. Inspect individual stability dimensions
 
 ``` r
-set.seed(1)
+coef_stability(diag_obj)
+pvalue_stability(diag_obj)
+selection_stability(diag_obj)
+prediction_stability(diag_obj)
+```
 
-# OLS
-d_lm  <- run_diagnostics(mpg ~ wt + hp, data = mtcars, B = 200)
+These functions answer different questions:
 
+- [`coef_stability()`](https://ntiGideon.github.io/ReproStat/reference/coef_stability.md):
+  Do coefficient magnitudes fluctuate a lot?
+- [`pvalue_stability()`](https://ntiGideon.github.io/ReproStat/reference/pvalue_stability.md):
+  Do significance decisions stay consistent?
+- [`selection_stability()`](https://ntiGideon.github.io/ReproStat/reference/selection_stability.md):
+  Do predictors keep the same sign or selection pattern?
+- [`prediction_stability()`](https://ntiGideon.github.io/ReproStat/reference/prediction_stability.md):
+  Do predictions stay similar across perturbations?
+
+### 3. Summarize with the Reproducibility Index
+
+``` r
+ri <- reproducibility_index(diag_obj)
+ri
+```
+
+The RI is a compact summary of multiple stability components, scaled to
+0-100.
+
+### 4. Visualize the result
+
+``` r
+oldpar <- par(mfrow = c(2, 2))
+plot_stability(diag_obj, "coefficient")
+plot_stability(diag_obj, "pvalue")
+plot_stability(diag_obj, "selection")
+plot_stability(diag_obj, "prediction")
+par(oldpar)
+```
+
+------------------------------------------------------------------------
+
+## Interpreting the Outputs
+
+### Perturbation methods
+
+| Method        | What it tests                  | Good when you want to assess         |
+|---------------|--------------------------------|--------------------------------------|
+| `"bootstrap"` | resampling variability         | ordinary data-driven stability       |
+| `"subsample"` | sample composition sensitivity | robustness to who enters the sample  |
+| `"noise"`     | measurement perturbation       | sensitivity to noisy recorded values |
+
+### Reproducibility Index
+
+The RI is best treated as an interpretive summary, not as a hard
+universal threshold.
+
+| RI range | Interpretation                                                 |
+|----------|----------------------------------------------------------------|
+| `90-100` | Highly stable under the chosen perturbation design             |
+| `70-89`  | Moderately stable; overall pattern is fairly dependable        |
+| `50-69`  | Mixed stability; some conclusions may be sensitive             |
+| `< 50`   | Low stability; investigate model dependence and data fragility |
+
+Two important cautions:
+
+- The RI depends on your perturbation scheme, backend, and tuning
+  choices.
+- RI values are not directly comparable across all backends, especially
+  `glmnet`, because not all components are defined the same way.
+
+------------------------------------------------------------------------
+
+## Supported Backends
+
+ReproStat supports four model-fitting backends through the same
+interface:
+
+| Backend    | Model family              | Notes              |
+|------------|---------------------------|--------------------|
+| `"lm"`     | ordinary least squares    | default            |
+| `"glm"`    | generalized linear models | use `family = ...` |
+| `"rlm"`    | robust regression         | requires `MASS`    |
+| `"glmnet"` | penalized regression      | requires `glmnet`  |
+
+Examples:
+
+``` r
 # Logistic regression
-d_glm <- run_diagnostics(am ~ wt + hp + qsec, data = mtcars, B = 200,
-                         family = binomial())
+diag_glm <- run_diagnostics(
+  am ~ wt + hp + qsec,
+  data = mtcars,
+  B = 100,
+  family = stats::binomial()
+)
 
 # Robust regression
-d_rlm <- run_diagnostics(mpg ~ wt + hp, data = mtcars, B = 200,
-                         backend = "rlm")
+if (requireNamespace("MASS", quietly = TRUE)) {
+  diag_rlm <- run_diagnostics(
+    mpg ~ wt + hp,
+    data = mtcars,
+    B = 100,
+    backend = "rlm"
+  )
+}
 
-# LASSO  (lambda chosen by cv.glmnet when lambda = NULL)
-d_las <- run_diagnostics(mpg ~ wt + hp + disp + qsec, data = mtcars,
-                         B = 200, backend = "glmnet", en_alpha = 1)
-
-# Ridge
-d_rid <- run_diagnostics(mpg ~ wt + hp + disp + qsec, data = mtcars,
-                         B = 200, backend = "glmnet", en_alpha = 0)
-
-# Elastic net (alpha = 0.5)
-d_en  <- run_diagnostics(mpg ~ wt + hp + disp + qsec, data = mtcars,
-                         B = 200, backend = "glmnet", en_alpha = 0.5)
-
-print(d_lm)
+# Penalized regression
+if (requireNamespace("glmnet", quietly = TRUE)) {
+  diag_lasso <- run_diagnostics(
+    mpg ~ wt + hp + disp + qsec,
+    data = mtcars,
+    B = 100,
+    backend = "glmnet",
+    en_alpha = 1
+  )
+}
 ```
 
 ------------------------------------------------------------------------
 
-### Stability metrics
+## Comparing Models with CV Ranking Stability
 
-All four functions accept a `"reprostat"` object and return scalar or
-vector summaries. Lower variance / higher frequency values indicate
-greater stability.
+ReproStat also helps evaluate **model-selection stability**, not just
+single-model stability.
 
-#### `coef_stability()`
-
-Per-coefficient variance across B iterations. Lower = more stable.
-
-``` r
-coef_stability(d_lm)
-#>  (Intercept)          wt          hp
-#>     5.182741    0.043812    0.000231
-```
-
-#### `pvalue_stability()`
-
-Proportion of iterations in which each coefficient is significant at
-`alpha`. Values near 0 or 1 are stable; 0.5 indicates random decisions.
-
-``` r
-pvalue_stability(d_lm)
-#>  (Intercept)          wt          hp
-#>        0.972       0.958       0.731
-```
-
-#### `selection_stability()`
-
-Same as
-[`pvalue_stability()`](https://ntiGideon.github.io/ReproStat/reference/pvalue_stability.md)
-but excludes the intercept. Useful for assessing variable selection
-consistency.
-
-``` r
-selection_stability(d_lm)
-#>    wt    hp
-#> 0.958 0.731
-```
-
-#### `prediction_stability()`
-
-Pointwise prediction variance across iterations, plus the mean.
-
-``` r
-ps <- prediction_stability(d_lm)
-ps$mean_variance          # scalar summary
-ps$pointwise_variance     # length-n vector
-```
-
-------------------------------------------------------------------------
-
-### `reproducibility_index()`
-
-Aggregates the four stability components into a composite RI on 0–100.
-
-``` r
-ri <- reproducibility_index(d_lm)
-ri$index        # 0–100 scalar
-ri$components   # named vector: coef, pvalue, selection, prediction
-```
-
-**Interpretation:**
-
-| RI     | Interpretation                                                   |
-|--------|------------------------------------------------------------------|
-| 90–100 | Highly reproducible                                              |
-| 70–89  | Moderately reproducible                                          |
-| 50–69  | Marginal — results sensitive to data variation                   |
-| \< 50  | Low reproducibility — results should be interpreted with caution |
-
-> **Note:** For `backend = "glmnet"`, p-values are undefined, so the
-> `pvalue` and `selection` components are `NA` and the RI is averaged
-> over the remaining two components (`coef` and `prediction`).
-
-------------------------------------------------------------------------
-
-### `ri_confidence_interval()`
-
-Bootstrap confidence interval for the RI, computed by resampling the
-already-stored perturbation draws (no extra model fitting).
-
-``` r
-ri_confidence_interval(d_lm, level = 0.95, R = 1000)
-#>  2.5% 97.5%
-#>  68.4  79.9
-```
-
-------------------------------------------------------------------------
-
-### `plot_stability()`
-
-Bar chart or histogram for one stability dimension.
-
-``` r
-plot_stability(d_lm, type = "coefficient")   # coefficient variance
-plot_stability(d_lm, type = "pvalue")        # significance frequency
-plot_stability(d_lm, type = "selection")     # selection frequency
-plot_stability(d_lm, type = "prediction")    # prediction variance histogram
-```
-
-------------------------------------------------------------------------
-
-### `cv_ranking_stability()`
-
-Evaluates model *selection* stability by running repeated K-fold
-cross-validation and recording the error-metric rank of each candidate
-model across repetitions.
-
-``` r
-cv_ranking_stability(
-  formulas,
-  data,
-  v       = 5L,
-  R       = 30L,
-  seed    = 20260307L,
-  family  = NULL,
-  backend = c("lm", "glm", "rlm", "glmnet"),
-  en_alpha = 1,
-  lambda  = NULL,
-  metric  = c("auto", "rmse", "logloss")
-)
-```
+[`cv_ranking_stability()`](https://ntiGideon.github.io/ReproStat/reference/cv_ranking_stability.md)
+repeatedly runs cross-validation across competing formulas and records
+how often each model ranks best.
 
 ``` r
 models <- list(
-  m1 = mpg ~ wt + hp,
-  m2 = mpg ~ wt + hp + disp,
-  m3 = mpg ~ wt + hp + disp + qsec
+  baseline = mpg ~ wt + hp,
+  medium   = mpg ~ wt + hp + disp,
+  full     = mpg ~ wt + hp + disp + qsec
 )
 
 cv_obj <- cv_ranking_stability(models, mtcars, v = 5, R = 50)
 cv_obj$summary
-#>   model mean_rmse sd_rmse mean_rank top1_frequency
-#> 1    m3     2.891   0.312      1.24           0.72
-#> 2    m2     3.014   0.389      1.94           0.24
-#> 3    m1     3.207   0.401      2.82           0.04
+plot_cv_stability(cv_obj, metric = "top1_frequency")
+plot_cv_stability(cv_obj, metric = "mean_rank")
 ```
 
-**Logistic models (log-loss metric):**
-
-``` r
-glm_models <- list(
-  m1 = am ~ wt + hp,
-  m2 = am ~ wt + hp + qsec
-)
-cv_ranking_stability(glm_models, mtcars, v = 5, R = 30,
-                     family = binomial(), metric = "logloss")
-```
+This is useful when the lowest average error and the most consistently
+top-ranked model are not the same thing.
 
 ------------------------------------------------------------------------
 
-### `plot_cv_stability()`
-
-Bar chart of CV ranking results.
-
-``` r
-plot_cv_stability(cv_obj, metric = "top1_frequency")  # proportion ranked 1st
-plot_cv_stability(cv_obj, metric = "mean_rank")        # average rank
-```
-
-------------------------------------------------------------------------
-
-## Full example
+## Example: End-to-End Analysis
 
 ``` r
 library(ReproStat)
+
 set.seed(42)
 
-# 1. Run diagnostics
-diag <- run_diagnostics(mpg ~ wt + hp + disp, data = mtcars, B = 200)
-
-# 2. Inspect individual metrics
-coef_stability(diag)
-pvalue_stability(diag)
-selection_stability(diag)
-prediction_stability(diag)$mean_variance
-
-# 3. Composite RI + CI
-ri <- reproducibility_index(diag)
-cat(sprintf("RI = %.1f\n", ri$index))
-ri_confidence_interval(diag, R = 500)
-
-# 4. Visualise
-par(mfrow = c(2, 2))
-plot_stability(diag, "coefficient")
-plot_stability(diag, "pvalue")
-plot_stability(diag, "selection")
-plot_stability(diag, "prediction")
-
-# 5. Cross-validation ranking stability
-models <- list(
-  base     = mpg ~ wt + hp,
-  extended = mpg ~ wt + hp + disp
+diag_obj <- run_diagnostics(
+  mpg ~ wt + hp + disp,
+  data = mtcars,
+  B = 200,
+  method = "bootstrap"
 )
-cv_obj <- cv_ranking_stability(models, mtcars, v = 5, R = 50)
-plot_cv_stability(cv_obj)
+
+# Individual summaries
+coef_stability(diag_obj)
+pvalue_stability(diag_obj)
+selection_stability(diag_obj)
+prediction_stability(diag_obj)$mean_variance
+
+# Composite summary
+ri <- reproducibility_index(diag_obj)
+cat(sprintf("RI = %.1f\n", ri$index))
+ri_confidence_interval(diag_obj, R = 500, seed = 42)
+
+# Visuals
+oldpar <- par(mfrow = c(2, 2))
+plot_stability(diag_obj, "coefficient")
+plot_stability(diag_obj, "pvalue")
+plot_stability(diag_obj, "selection")
+plot_stability(diag_obj, "prediction")
+par(oldpar)
 ```
 
 ------------------------------------------------------------------------
 
-## Perturbation methods — when to use which
+## Learn More on the pkgdown Site
 
-| Scenario                          | Recommended method |
-|-----------------------------------|--------------------|
-| Small dataset, standard inference | `"bootstrap"`      |
-| Robustness to sample composition  | `"subsample"`      |
-| Sensitivity to measurement noise  | `"noise"`          |
+The pkgdown site is organized for different user needs:
 
-------------------------------------------------------------------------
+- **Get started**: a narrative introduction and first analysis
+- **Articles**: interpretation guidance, backend choices, and workflow
+  patterns
+- **Reference**: individual function documentation
+- **Changelog**: package evolution over releases
 
-## Reproducibility Index — component reference
+Key pages:
 
-| Component    | Formula summary                                                    | NA for glmnet? |
-|--------------|--------------------------------------------------------------------|----------------|
-| `coef`       | Mean exp-decay of coefficient variance relative to base estimate   | No             |
-| `pvalue`     | Mean distance of significance frequency from 0.5                   | Yes            |
-| `selection`  | Mean distance of selection frequency from 0.5                      | Yes            |
-| `prediction` | Exp-decay of mean prediction variance relative to outcome variance | No             |
-
-The final RI averages all non-NA components and scales to 0–100.
+- [`vignette("ReproStat-intro")`](https://ntiGideon.github.io/ReproStat/articles/ReproStat-intro.md)
+- the interpretation article
+- the backend guide
+- the workflow patterns article
 
 ------------------------------------------------------------------------
 
 ## Citation
 
-If you use ReproStat in published work, please cite the accompanying
-Journal of Statistical Software manuscript:
-
-> Nti Boateng, G. (2026). *ReproStat: Reproducibility Diagnostics for
-> Statistical Modeling in R*. Journal of Statistical Software.
+If you use ReproStat in published work, cite the package and any
+associated manuscript or software record that accompanies the release
+you used.
 
 ------------------------------------------------------------------------
 

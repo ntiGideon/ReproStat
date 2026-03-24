@@ -13,8 +13,7 @@
 <link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Introduction to ReproStat">
-<meta name="description" content="ReproStat: R package for reproducibility diagnostics
-               in statistical modeling.">
+<meta name="description" content="ReproStat is an R package for reproducibility diagnostics in statistical modeling, with perturbation-based stability metrics, a reproducibility index, and repeated CV ranking stability.">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -33,16 +32,14 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="active nav-item"><a class="nav-link" href="../articles/ReproStat-intro.html">Get started</a></li>
+<li class="active nav-item"><a class="nav-link" href="../articles/ReproStat-intro.html">Get Started</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/ReproStat-intro.html">Introduction to ReproStat</a></li>
-    <li><h6 class="dropdown-header" data-toc-skip>─────────────────</h6></li>
-    <li><h6 class="dropdown-header" data-toc-skip>Backends</h6></li>
-    <li><a class="dropdown-item" href="../articles/ReproStat-intro.html#backends">Using lm and glm backends</a></li>
-    <li><a class="dropdown-item" href="../articles/ReproStat-intro.html#robust-regression">Using rlm (robust regression)</a></li>
-    <li><a class="dropdown-item" href="../articles/ReproStat-intro.html#penalized-regression">Using glmnet (LASSO / ridge)</a></li>
+<li><a class="dropdown-item" href="../articles/ReproStat-intro.html">Introduction</a></li>
+    <li><a class="dropdown-item" href="../articles/interpreting-reprostat.html">Interpreting Outputs</a></li>
+    <li><a class="dropdown-item" href="../articles/backend-guide.html">Backend Guide</a></li>
+    <li><a class="dropdown-item" href="../articles/workflow-patterns.html">Workflow Patterns</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
@@ -52,7 +49,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/ntiGideon/ReproStat" aria-label="GitHub"><span class="fa fab fa-github"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/ntiGideon/ReproStat" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
 
@@ -87,19 +84,19 @@ concerns.</p>
 <p>The package computes:</p>
 <ul>
 <li>
-<strong>Coefficient stability</strong> – variance of estimates
+<strong>Coefficient stability</strong> - variance of estimates
 across perturbations.</li>
 <li>
-<strong>P-value stability</strong> – frequency of significant
+<strong>P-value stability</strong> - frequency of significant
 findings.</li>
 <li>
-<strong>Selection stability</strong> – frequency of variable
-selection.</li>
+<strong>Selection stability</strong> - frequency of variable
+selection behavior.</li>
 <li>
-<strong>Prediction stability</strong> – variance of
+<strong>Prediction stability</strong> - variance of
 predictions.</li>
 <li>
-<strong>Reproducibility Index (RI)</strong> – a composite 0–100
+<strong>Reproducibility Index (RI)</strong> - a composite 0-100
 score.</li>
 </ul>
 </div>
@@ -112,8 +109,8 @@ score.</li>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mt_diag</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_diagnostics.html">run_diagnostics</a></span><span class="op">(</span></span>
 <span>  <span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">hp</span> <span class="op">+</span> <span class="va">disp</span>,</span>
-<span>  data   <span class="op">=</span> <span class="va">mtcars</span>,</span>
-<span>  B      <span class="op">=</span> <span class="fl">200</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">mtcars</span>,</span>
+<span>  B <span class="op">=</span> <span class="fl">200</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"bootstrap"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">mt_diag</span></span>
@@ -154,7 +151,7 @@ score.</li>
 <span><span class="co">#&gt;  0.9188745  0.8200000  0.8383333  0.9737808</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="step-4-visualise">Step 4: Visualise<a class="anchor" aria-label="anchor" href="#step-4-visualise"></a>
+<h3 id="step-4-visualize">Step 4: Visualize<a class="anchor" aria-label="anchor" href="#step-4-visualize"></a>
 </h3>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">oldpar</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
@@ -187,7 +184,7 @@ models across repeated cross-validation runs.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">models</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  baseline <span class="op">=</span> <span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">hp</span> <span class="op">+</span> <span class="va">disp</span>,</span>
-<span>  compact  <span class="op">=</span> <span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">hp</span>,</span>
+<span>  compact <span class="op">=</span> <span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">hp</span>,</span>
 <span>  expanded <span class="op">=</span> <span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">hp</span> <span class="op">+</span> <span class="va">disp</span> <span class="op">+</span> <span class="va">qsec</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -209,8 +206,8 @@ response and numeric predictors works:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">iris_diag</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_diagnostics.html">run_diagnostics</a></span><span class="op">(</span></span>
 <span>  <span class="va">Sepal.Length</span> <span class="op">~</span> <span class="va">Sepal.Width</span> <span class="op">+</span> <span class="va">Petal.Length</span> <span class="op">+</span> <span class="va">Petal.Width</span>,</span>
-<span>  data   <span class="op">=</span> <span class="va">iris</span>,</span>
-<span>  B      <span class="op">=</span> <span class="fl">150</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">iris</span>,</span>
+<span>  B <span class="op">=</span> <span class="fl">150</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"noise"</span>,</span>
 <span>  noise_sd <span class="op">=</span> <span class="fl">0.03</span></span>
 <span><span class="op">)</span></span>
@@ -226,8 +223,8 @@ response and numeric predictors works:</p>
 <code class="sourceCode R"><span><span class="va">aq</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="va">airquality</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Ozone"</span>, <span class="st">"Solar.R"</span>, <span class="st">"Wind"</span>, <span class="st">"Temp"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="va">aq_diag</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_diagnostics.html">run_diagnostics</a></span><span class="op">(</span></span>
 <span>  <span class="va">Ozone</span> <span class="op">~</span> <span class="va">Solar.R</span> <span class="op">+</span> <span class="va">Wind</span> <span class="op">+</span> <span class="va">Temp</span>,</span>
-<span>  data   <span class="op">=</span> <span class="va">aq</span>,</span>
-<span>  B      <span class="op">=</span> <span class="fl">150</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">aq</span>,</span>
+<span>  B <span class="op">=</span> <span class="fl">150</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"bootstrap"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/reproducibility_index.html">reproducibility_index</a></span><span class="op">(</span><span class="va">aq_diag</span><span class="op">)</span></span>
@@ -239,7 +236,7 @@ response and numeric predictors works:</p>
 <span><span class="co">#&gt;  0.7181772  0.8888889  1.0000000  0.9838995</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="uncertainty-in-the-ri-bootstrap-confidence-interval">Uncertainty in the RI: bootstrap confidence interval<a class="anchor" aria-label="anchor" href="#uncertainty-in-the-ri-bootstrap-confidence-interval"></a>
+<h2 id="uncertainty-in-the-ri">Uncertainty in the RI<a class="anchor" aria-label="anchor" href="#uncertainty-in-the-ri"></a>
 </h2>
 <p><code><a href="../reference/ri_confidence_interval.html">ri_confidence_interval()</a></code> resamples the stored
 perturbation draws to estimate uncertainty in the RI without refitting
@@ -258,24 +255,35 @@ any models.</p>
 <code>backend</code> argument changes.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Generalized linear model (logistic)</span></span>
-<span><span class="fu"><a href="../reference/run_diagnostics.html">run_diagnostics</a></span><span class="op">(</span><span class="va">am</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">hp</span>, <span class="va">mtcars</span>, B <span class="op">=</span> <span class="fl">100</span>,</span>
-<span>                family <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/run_diagnostics.html">run_diagnostics</a></span><span class="op">(</span></span>
+<span>  <span class="va">am</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">hp</span>,</span>
+<span>  <span class="va">mtcars</span>,</span>
+<span>  B <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>  family <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">binomial</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Robust regression (requires MASS)</span></span>
-<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"MASS"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"MASS"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="../reference/run_diagnostics.html">run_diagnostics</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">hp</span>, <span class="va">mtcars</span>, B <span class="op">=</span> <span class="fl">100</span>, backend <span class="op">=</span> <span class="st">"rlm"</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
 <span></span>
 <span><span class="co"># LASSO (requires glmnet)</span></span>
-<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"glmnet"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="../reference/run_diagnostics.html">run_diagnostics</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">hp</span> <span class="op">+</span> <span class="va">disp</span> <span class="op">+</span> <span class="va">qsec</span>, <span class="va">mtcars</span>,</span>
-<span>                  B <span class="op">=</span> <span class="fl">100</span>, backend <span class="op">=</span> <span class="st">"glmnet"</span>, en_alpha <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"glmnet"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="../reference/run_diagnostics.html">run_diagnostics</a></span><span class="op">(</span></span>
+<span>    <span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">hp</span> <span class="op">+</span> <span class="va">disp</span> <span class="op">+</span> <span class="va">qsec</span>,</span>
+<span>    <span class="va">mtcars</span>,</span>
+<span>    B <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>    backend <span class="op">=</span> <span class="st">"glmnet"</span>,</span>
+<span>    en_alpha <span class="op">=</span> <span class="fl">1</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="ggplot2-helpers">ggplot2 helpers<a class="anchor" aria-label="anchor" href="#ggplot2-helpers"></a>
 </h2>
 <p>If <strong>ggplot2</strong> is installed,
 <code><a href="../reference/plot_stability_gg.html">plot_stability_gg()</a></code> and <code><a href="../reference/plot_cv_stability_gg.html">plot_cv_stability_gg()</a></code>
-return <code>ggplot</code> objects that can be further customised.</p>
+return <code>ggplot</code> objects that can be further customized.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"ggplot2"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
@@ -284,6 +292,23 @@ return <code>ggplot</code> objects that can be further customised.</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="../reference/plot_stability_gg.html">plot_stability_gg</a></span><span class="op">(</span><span class="va">d_gg</span>, <span class="st">"selection"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p><img src="ReproStat-intro_files/figure-html/ggplot-helpers-1.png" class="r-plt" alt="" width="672"><img src="ReproStat-intro_files/figure-html/ggplot-helpers-2.png" class="r-plt" alt="" width="672"></p>
+</div>
+<div class="section level2">
+<h2 id="where-to-go-next">Where to go next<a class="anchor" aria-label="anchor" href="#where-to-go-next"></a>
+</h2>
+<p>After this introduction, the most useful follow-up articles are:</p>
+<ul>
+<li>
+<strong>Interpreting ReproStat Outputs</strong> for guidance on
+reading the metrics and the RI in applied work</li>
+<li>
+<strong>Backend Guide</strong> for choosing among <code>lm</code>,
+<code>glm</code>, <code>rlm</code>, and <code>glmnet</code>
+</li>
+<li>
+<strong>Workflow Patterns</strong> for practical analysis
+templates</li>
+</ul>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

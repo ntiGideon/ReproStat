@@ -1,19 +1,30 @@
 # Package index
 
-## Core workflow
+## Start Here
 
-The main pipeline: perturb data → run diagnostics → extract metrics.
+Core entry points for fitting diagnostics, summarizing them, and
+understanding the package.
 
+- [`ReproStat`](https://ntiGideon.github.io/ReproStat/reference/ReproStat-package.md)
+  [`ReproStat-package`](https://ntiGideon.github.io/ReproStat/reference/ReproStat-package.md)
+  : ReproStat: Reproducibility Diagnostics for Statistical Modeling
 - [`run_diagnostics()`](https://ntiGideon.github.io/ReproStat/reference/run_diagnostics.md)
   : Run reproducibility diagnostics
+- [`print(`*`<reprostat>`*`)`](https://ntiGideon.github.io/ReproStat/reference/print.reprostat.md)
+  : Print a reprostat object
+
+## Data Perturbation
+
+Functions for generating perturbed datasets and choosing a perturbation
+design that matches the stability question you want to ask.
+
 - [`perturb_data()`](https://ntiGideon.github.io/ReproStat/reference/perturb_data.md)
   : Perturb a dataset
 
-## Stability metrics
+## Stability Metrics
 
-Four metrics computed from a `reprostat` object returned by
-[`run_diagnostics()`](https://ntiGideon.github.io/ReproStat/reference/run_diagnostics.md).
-Each captures a different dimension of stability.
+Component-level summaries of how coefficients, significance decisions,
+predictor behavior, and predictions vary across perturbations.
 
 - [`coef_stability()`](https://ntiGideon.github.io/ReproStat/reference/coef_stability.md)
   : Coefficient stability
@@ -24,49 +35,34 @@ Each captures a different dimension of stability.
 - [`prediction_stability()`](https://ntiGideon.github.io/ReproStat/reference/prediction_stability.md)
   : Prediction stability
 
-## Reproducibility Index
+## Composite Summary
 
-Composite index (0–100) aggregating all four stability components, plus
-a bootstrap confidence interval.
+Aggregate the component diagnostics into a Reproducibility Index and
+quantify uncertainty in that summary.
 
 - [`reproducibility_index()`](https://ntiGideon.github.io/ReproStat/reference/reproducibility_index.md)
   : Reproducibility index
 - [`ri_confidence_interval()`](https://ntiGideon.github.io/ReproStat/reference/ri_confidence_interval.md)
   : Bootstrap confidence interval for the reproducibility index
 
-## Cross-validation ranking stability
+## Model Comparison
 
-Compare multiple candidate models via repeated K-fold CV and assess how
-consistently each model ranks as the best.
+Repeated cross-validation tools for comparing candidate formulas by
+ranking stability rather than average error alone.
 
 - [`cv_ranking_stability()`](https://ntiGideon.github.io/ReproStat/reference/cv_ranking_stability.md)
   : Cross-validation ranking stability
-
-## Visualisation
-
-Base-graphics and ggplot2 plots for stability diagnostics and CV
-results.
-
-- [`plot_stability()`](https://ntiGideon.github.io/ReproStat/reference/plot_stability.md)
-  : Plot stability diagnostics
-- [`plot_stability_gg()`](https://ntiGideon.github.io/ReproStat/reference/plot_stability_gg.md)
-  : ggplot2-based stability plot
 - [`plot_cv_stability()`](https://ntiGideon.github.io/ReproStat/reference/plot_cv_stability.md)
   : Plot cross-validation ranking stability
 - [`plot_cv_stability_gg()`](https://ntiGideon.github.io/ReproStat/reference/plot_cv_stability_gg.md)
   : ggplot2-based CV ranking stability plot
 
-## S3 methods
+## Visualization
 
-Methods for the `reprostat` S3 class.
+Plotting helpers for inspecting the stability structure of a fitted
+ReproStat object.
 
-- [`print(`*`<reprostat>`*`)`](https://ntiGideon.github.io/ReproStat/reference/print.reprostat.md)
-  : Print a reprostat object
-
-## Package
-
-Package-level documentation.
-
-- [`ReproStat`](https://ntiGideon.github.io/ReproStat/reference/ReproStat-package.md)
-  [`ReproStat-package`](https://ntiGideon.github.io/ReproStat/reference/ReproStat-package.md)
-  : ReproStat: Reproducibility Diagnostics for Statistical Modeling
+- [`plot_stability()`](https://ntiGideon.github.io/ReproStat/reference/plot_stability.md)
+  : Plot stability diagnostics
+- [`plot_stability_gg()`](https://ntiGideon.github.io/ReproStat/reference/plot_stability_gg.md)
+  : ggplot2-based stability plot

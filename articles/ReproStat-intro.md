@@ -10,12 +10,12 @@ reproducibility; volatile outputs flag potential concerns.
 
 The package computes:
 
-- **Coefficient stability** – variance of estimates across
+- **Coefficient stability** - variance of estimates across
   perturbations.
-- **P-value stability** – frequency of significant findings.
-- **Selection stability** – frequency of variable selection.
-- **Prediction stability** – variance of predictions.
-- **Reproducibility Index (RI)** – a composite 0–100 score.
+- **P-value stability** - frequency of significant findings.
+- **Selection stability** - frequency of variable selection behavior.
+- **Prediction stability** - variance of predictions.
+- **Reproducibility Index (RI)** - a composite 0-100 score.
 
 ## Basic workflow
 
@@ -24,8 +24,8 @@ The package computes:
 ``` r
 mt_diag <- run_diagnostics(
   mpg ~ wt + hp + disp,
-  data   = mtcars,
-  B      = 200,
+  data = mtcars,
+  B = 200,
   method = "bootstrap"
 )
 mt_diag
@@ -66,7 +66,7 @@ reproducibility_index(mt_diag)
 #>  0.9188745  0.8200000  0.8383333  0.9737808
 ```
 
-### Step 4: Visualise
+### Step 4: Visualize
 
 ``` r
 oldpar <- par(mfrow = c(1, 2))
@@ -105,7 +105,7 @@ runs.
 ``` r
 models <- list(
   baseline = mpg ~ wt + hp + disp,
-  compact  = mpg ~ wt + hp,
+  compact = mpg ~ wt + hp,
   expanded = mpg ~ wt + hp + disp + qsec
 )
 
@@ -131,8 +131,8 @@ and numeric predictors works:
 ``` r
 iris_diag <- run_diagnostics(
   Sepal.Length ~ Sepal.Width + Petal.Length + Petal.Width,
-  data   = iris,
-  B      = 150,
+  data = iris,
+  B = 150,
   method = "noise",
   noise_sd = 0.03
 )
@@ -151,8 +151,8 @@ For datasets with missing values, subset to complete cases first:
 aq <- na.omit(airquality[, c("Ozone", "Solar.R", "Wind", "Temp")])
 aq_diag <- run_diagnostics(
   Ozone ~ Solar.R + Wind + Temp,
-  data   = aq,
-  B      = 150,
+  data = aq,
+  B = 150,
   method = "bootstrap"
 )
 reproducibility_index(aq_diag)
@@ -164,7 +164,7 @@ reproducibility_index(aq_diag)
 #>  0.7181772  0.8888889  1.0000000  0.9838995
 ```
 
-## Uncertainty in the RI: bootstrap confidence interval
+## Uncertainty in the RI
 
 [`ri_confidence_interval()`](https://ntiGideon.github.io/ReproStat/reference/ri_confidence_interval.md)
 resamples the stored perturbation draws to estimate uncertainty in the
@@ -185,17 +185,28 @@ ReproStat supports four backends. All use the same API; only the
 
 ``` r
 # Generalized linear model (logistic)
-run_diagnostics(am ~ wt + hp, mtcars, B = 100,
-                family = stats::binomial())
+run_diagnostics(
+  am ~ wt + hp,
+  mtcars,
+  B = 100,
+  family = stats::binomial()
+)
 
 # Robust regression (requires MASS)
-if (requireNamespace("MASS", quietly = TRUE))
+if (requireNamespace("MASS", quietly = TRUE)) {
   run_diagnostics(mpg ~ wt + hp, mtcars, B = 100, backend = "rlm")
+}
 
 # LASSO (requires glmnet)
-if (requireNamespace("glmnet", quietly = TRUE))
-  run_diagnostics(mpg ~ wt + hp + disp + qsec, mtcars,
-                  B = 100, backend = "glmnet", en_alpha = 1)
+if (requireNamespace("glmnet", quietly = TRUE)) {
+  run_diagnostics(
+    mpg ~ wt + hp + disp + qsec,
+    mtcars,
+    B = 100,
+    backend = "glmnet",
+    en_alpha = 1
+  )
+}
 ```
 
 ## ggplot2 helpers
@@ -204,7 +215,7 @@ If **ggplot2** is installed,
 [`plot_stability_gg()`](https://ntiGideon.github.io/ReproStat/reference/plot_stability_gg.md)
 and
 [`plot_cv_stability_gg()`](https://ntiGideon.github.io/ReproStat/reference/plot_cv_stability_gg.md)
-return `ggplot` objects that can be further customised.
+return `ggplot` objects that can be further customized.
 
 ``` r
 if (requireNamespace("ggplot2", quietly = TRUE)) {
@@ -216,3 +227,12 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
 ```
 
 ![](ReproStat-intro_files/figure-html/ggplot-helpers-1.png)![](ReproStat-intro_files/figure-html/ggplot-helpers-2.png)
+
+## Where to go next
+
+After this introduction, the most useful follow-up articles are:
+
+- **Interpreting ReproStat Outputs** for guidance on reading the metrics
+  and the RI in applied work
+- **Backend Guide** for choosing among `lm`, `glm`, `rlm`, and `glmnet`
+- **Workflow Patterns** for practical analysis templates
