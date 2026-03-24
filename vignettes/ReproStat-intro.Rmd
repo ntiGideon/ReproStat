@@ -66,10 +66,10 @@ reproducibility_index(mt_diag)
 ### Step 4: Visualise
 
 ```{r plots}
-par(mfrow = c(1, 2))
+oldpar <- par(mfrow = c(1, 2))
 plot_stability(mt_diag, "coefficient")
 plot_stability(mt_diag, "selection")
-par(mfrow = c(1, 1))
+par(oldpar)
 ```
 
 ## Perturbation methods

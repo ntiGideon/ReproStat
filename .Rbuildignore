@@ -8,4 +8,6 @@
 ^docs$
 ^pkgdown$
 ^cran-comments\.md$
+^sample_runer\.R$
+^Rplots\.pdf$
 

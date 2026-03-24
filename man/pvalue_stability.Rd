@@ -10,13 +10,15 @@ pvalue_stability(diag_obj)
 \item{diag_obj}{A \code{reprostat} object from \code{\link{run_diagnostics}}.}
 }
 \value{
-A named numeric vector of significance frequencies in \eqn{[0, 1]}.
+A named numeric vector of significance frequencies in \eqn{[0, 1]},
+  excluding the intercept.  All \code{NaN} for \code{backend = "glmnet"}
+  (p-values are not defined).
 }
 \description{
-Computes the proportion of perturbation iterations in which each coefficient
-is statistically significant (p-value below \code{alpha}).
-Values near 0 or 1 indicate stable decisions; values near 0.5 indicate high
-instability.
+Computes the proportion of perturbation iterations in which each predictor
+is statistically significant (p-value below \code{alpha}).  The intercept
+is excluded.  Values near 0 or 1 indicate stable decisions; values near 0.5
+indicate high instability.
 }
 \examples{
 set.seed(1)

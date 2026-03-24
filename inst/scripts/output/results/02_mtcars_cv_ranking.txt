@@ -1,7 +1,0 @@
-=== mtcars: CV Ranking Stability | v=5 folds, R=40 repeats === 
-
-     model mean_rmse   sd_rmse mean_rank top1_frequency
-1  compact  2.684893 0.1629443     1.050           0.95
-2 expanded  2.811187 0.1605096     2.425           0.05
-3 baseline  2.798253 0.1474168     2.525           0.00
-

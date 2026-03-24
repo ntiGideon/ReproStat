@@ -1,7 +1,0 @@
-=== airquality: CV Ranking | v=5, R=30 === 
-
-      model mean_rmse   sd_rmse mean_rank top1_frequency
-1 quadratic  19.98289 0.3545098         1              1
-2      full  21.32496 0.3665722         2              0
-3  no_solar  21.85224 0.3374268         3              0
-

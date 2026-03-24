@@ -16,7 +16,8 @@ run_diagnostics(
   family = NULL,
   backend = c("lm", "glm", "rlm", "glmnet"),
   en_alpha = 1,
-  lambda = NULL
+  lambda = NULL,
+  perturb_response = FALSE
 )
 }
 \arguments{
@@ -61,6 +62,13 @@ Ignored for other backends.}
 \code{NULL} (default) the penalty is selected by
 \code{glmnet::cv.glmnet} using \code{lambda.min}.  Ignored for
 other backends.}
+
+\item{perturb_response}{Logical. When \code{FALSE} (default) and
+\code{method = "noise"}, noise is added only to predictor columns; the
+response variable is left unchanged.  Set to \code{TRUE} to also perturb
+the response (e.g. to simulate measurement error in the outcome).
+Has no effect for \code{method = "bootstrap"} or \code{"subsample"},
+where row-level resampling naturally carries the response along.}
 }
 \value{
 An object of class \code{"reprostat"}, a list with components:

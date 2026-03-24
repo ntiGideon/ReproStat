@@ -4,7 +4,7 @@
 \alias{ri_confidence_interval}
 \title{Bootstrap confidence interval for the reproducibility index}
 \usage{
-ri_confidence_interval(diag_obj, level = 0.95, R = 1000L, seed = 20260307L)
+ri_confidence_interval(diag_obj, level = 0.95, R = 1000L, seed = NULL)
 }
 \arguments{
 \item{diag_obj}{A \code{reprostat} object from \code{\link{run_diagnostics}}.}
@@ -15,7 +15,9 @@ Default is \code{0.95}.}
 \item{R}{Number of bootstrap resamples of the perturbation draws.
 Default is \code{1000}. Values of 300--500 are sufficient for most uses.}
 
-\item{seed}{Integer random seed. Default is \code{20260307}.}
+\item{seed}{Integer random seed passed to \code{\link[base]{set.seed}}, or
+\code{NULL} (default) to leave the global RNG state undisturbed.
+Pass an integer for fully reproducible intervals.}
 }
 \value{
 A named numeric vector of length 2 giving the lower and upper
@@ -28,6 +30,6 @@ already stored in a \code{reprostat} object (no additional model fitting).
 \examples{
 set.seed(1)
 d <- run_diagnostics(mpg ~ wt + hp, data = mtcars, B = 50)
-ri_confidence_interval(d, R = 200)
+ri_confidence_interval(d, R = 200, seed = 1)
 
 }

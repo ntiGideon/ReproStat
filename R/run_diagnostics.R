@@ -37,6 +37,12 @@
 #'   \code{NULL} (default) the penalty is selected by
 #'   \code{glmnet::cv.glmnet} using \code{lambda.min}.  Ignored for
 #'   other backends.
+#' @param perturb_response Logical. When \code{FALSE} (default) and
+#'   \code{method = "noise"}, noise is added only to predictor columns; the
+#'   response variable is left unchanged.  Set to \code{TRUE} to also perturb
+#'   the response (e.g. to simulate measurement error in the outcome).
+#'   Has no effect for \code{method = "bootstrap"} or \code{"subsample"},
+#'   where row-level resampling naturally carries the response along.
 #'
 #' @return An object of class \code{"reprostat"}, a list with components:
 #'   \describe{
@@ -94,7 +100,8 @@ run_diagnostics <- function(formula, data, B = 200,
                             family = NULL,
                             backend = c("lm", "glm", "rlm", "glmnet"),
                             en_alpha = 1,
-                            lambda = NULL) {
+                            lambda = NULL,
+                            perturb_response = FALSE) {
   method  <- match.arg(method)
   backend <- match.arg(backend)
 
@@ -112,6 +119,14 @@ run_diagnostics <- function(formula, data, B = 200,
   if (!is.null(family) && backend == "lm") backend <- "glm"
 
   if (is.null(predict_newdata)) predict_newdata <- data
+
+  # Determine response column to exclude from noise when perturb_response = FALSE
+  noise_response_col <- if (!perturb_response && method == "noise") {
+    lhs_vars <- all.vars(formula[[2]])
+    if (length(lhs_vars) == 1L) lhs_vars else NULL
+  } else {
+    NULL
+  }
 
   # Package availability checks
   if (backend == "rlm" && !requireNamespace("MASS", quietly = TRUE))
@@ -210,7 +225,8 @@ run_diagnostics <- function(formula, data, B = 200,
 
   # ---- perturbation loop ----
   for (b in seq_len(B)) {
-    d_b   <- perturb_data(data, method = method, frac = frac, noise_sd = noise_sd)
+    d_b   <- perturb_data(data, method = method, frac = frac, noise_sd = noise_sd,
+                          response_col = noise_response_col)
     fit_b <- tryCatch(.fit(d_b), error = function(e) NULL)
     if (is.null(fit_b)) next
 

@@ -192,10 +192,10 @@ cat("iris selection stability:\n")
 print(round(selection_stability(iris_diag), 3))
 
 dev.new()
-par(mfrow = c(1, 2))
+oldpar <- par(mfrow = c(1, 2))
 plot_stability(iris_diag, "coefficient")
 plot_stability(iris_diag, "selection")
-par(mfrow = c(1, 1))
+par(oldpar)
 
 
 ## ------------------------------------------------------------
@@ -219,10 +219,10 @@ aq_ci <- ri_confidence_interval(aq_diag, R = 300)
 cat(sprintf("[%.2f, %.2f]\n", aq_ci[1], aq_ci[2]))
 
 dev.new()
-par(mfrow = c(1, 2))
+oldpar <- par(mfrow = c(1, 2))
 plot_stability(aq_diag, "coefficient")
 plot_stability(aq_diag, "prediction")
-par(mfrow = c(1, 1))
+par(oldpar)
 
 # CV model comparison for airquality
 aq_models <- list(

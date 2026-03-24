@@ -31,6 +31,7 @@ utilities are also provided.
 \seealso{
 Useful links:
 \itemize{
+  \item \url{https://ntiGideon.github.io/ReproStat}
   \item \url{https://github.com/ntiGideon/ReproStat}
   \item Report bugs at \url{https://github.com/ntiGideon/ReproStat/issues}
 }
