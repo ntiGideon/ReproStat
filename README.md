@@ -11,10 +11,6 @@ ReproStat evaluates how stable a fitted model's outputs (coefficients, p-values,
 ### From source (local)
 
 ```r
-<<<<<<< HEAD
-# From inside the ReproStat/ directory, or supply the path:
-=======
->>>>>>> 9f55eb1aeda2bcb3ec08589abe15faeae5e411a1
 devtools::install("ReproStat")
 ```
 
