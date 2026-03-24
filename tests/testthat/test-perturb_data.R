@@ -41,10 +41,31 @@ test_that("noise does not change dimensions", {
   expect_equal(dim(d), dim(mtcars))
 })
 
-test_that("noise changes numeric values", {
+test_that("noise changes numeric values by default (including response)", {
   set.seed(1)
   d <- perturb_data(mtcars, method = "noise", noise_sd = 0.5)
+  # Without response_col, ALL numeric columns including mpg are perturbed
   expect_false(identical(d$mpg, mtcars$mpg))
+  expect_false(identical(d$wt,  mtcars$wt))
+})
+
+test_that("noise with response_col leaves that column unchanged", {
+  set.seed(1)
+  d <- perturb_data(mtcars, method = "noise", noise_sd = 0.5,
+                    response_col = "mpg")
+  expect_identical(d$mpg, mtcars$mpg)       # response protected
+  expect_false(identical(d$wt, mtcars$wt))  # predictors still perturbed
+})
+
+test_that("noise response_col does not affect bootstrap or subsample", {
+  # response_col is silently ignored for non-noise methods
+  set.seed(1)
+  d_boot <- perturb_data(mtcars, method = "bootstrap", response_col = "mpg")
+  expect_equal(nrow(d_boot), nrow(mtcars))
+
+  d_sub <- perturb_data(mtcars, method = "subsample", frac = 0.8,
+                        response_col = "mpg")
+  expect_lte(nrow(d_sub), nrow(mtcars))
 })
 
 test_that("noise does not change non-numeric columns", {
@@ -59,6 +80,22 @@ test_that("noise does not alter zero-variance columns", {
   set.seed(1)
   d <- perturb_data(df, method = "noise", noise_sd = 0.5)
   expect_identical(d$x, df$x)  # constant column unchanged
+})
+
+test_that("response_col not in data raises an error", {
+  expect_error(
+    perturb_data(mtcars, method = "noise", noise_sd = 0.1,
+                 response_col = "nonexistent"),
+    "not found"
+  )
+})
+
+test_that("response_col must be a single string", {
+  expect_error(
+    perturb_data(mtcars, method = "noise", noise_sd = 0.1,
+                 response_col = c("mpg", "wt")),
+    "single character"
+  )
 })
 
 test_that("invalid method errors", {

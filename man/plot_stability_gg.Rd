@@ -21,10 +21,12 @@ the selection frequency of each predictor term, ordered from lowest to
 highest value.
 }
 \examples{
-\dontrun{
-d <- run_diagnostics(mpg ~ wt + hp, mtcars, B = 50)
-plot_stability_gg(d, "coefficient")
-plot_stability_gg(d, "selection")
+\donttest{
+if (requireNamespace("ggplot2", quietly = TRUE)) {
+  d <- run_diagnostics(mpg ~ wt + hp, mtcars, B = 50)
+  plot_stability_gg(d, "coefficient")
+  plot_stability_gg(d, "selection")
+}
 }
 
 }

@@ -21,11 +21,13 @@ or the mean rank of each candidate model from a repeated cross-validation
 stability run.
 }
 \examples{
-\dontrun{
-models <- list(m1 = mpg ~ wt + hp, m2 = mpg ~ wt + hp + disp)
-cv <- cv_ranking_stability(models, mtcars, v = 5, R = 20)
-plot_cv_stability_gg(cv, "top1_frequency")
-plot_cv_stability_gg(cv, "mean_rank")
+\donttest{
+if (requireNamespace("ggplot2", quietly = TRUE)) {
+  models <- list(m1 = mpg ~ wt + hp, m2 = mpg ~ wt + hp + disp)
+  cv <- cv_ranking_stability(models, mtcars, v = 5, R = 20)
+  plot_cv_stability_gg(cv, "top1_frequency")
+  plot_cv_stability_gg(cv, "mean_rank")
+}
 }
 
 }

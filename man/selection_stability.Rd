@@ -10,12 +10,28 @@ selection_stability(diag_obj)
 \item{diag_obj}{A \code{reprostat} object from \code{\link{run_diagnostics}}.}
 }
 \value{
-A named numeric vector of selection frequencies in \eqn{[0, 1]},
+A named numeric vector of selection stability values in \eqn{[0, 1]},
   excluding the intercept.
 }
 \description{
-Computes the proportion of perturbation iterations in which each predictor
-is selected (its p-value is below \code{alpha}). The intercept is excluded.
+Measures how consistently each predictor is \emph{selected} across
+perturbation iterations.  The definition depends on the modeling backend:
+}
+\details{
+\describe{
+  \item{\code{"lm"}, \code{"glm"}, \code{"rlm"}}{
+    \strong{Sign consistency}: the proportion of perturbation iterations in
+    which the estimated coefficient has the same sign as in the base fit.
+    A value of 1 means the direction of the effect is perfectly stable; 0.5
+    means the sign is random.  Returns \code{NA} for a predictor whose
+    base-fit coefficient is exactly zero.}
+  \item{\code{"glmnet"}}{
+    \strong{Non-zero selection frequency}: the proportion of perturbation
+    iterations in which the coefficient is non-zero (i.e. the variable
+    survives the regularisation penalty).}
+}
+
+The intercept is always excluded.
 }
 \examples{
 set.seed(1)

@@ -15,8 +15,8 @@ A list with components:
     \item{\code{index}}{Scalar RI on a 0--100 scale.}
     \item{\code{components}}{Named numeric vector with four sub-scores:
       \code{coef}, \code{pvalue}, \code{selection}, \code{prediction}.
-      \code{pvalue} and \code{selection} are \code{NA} for
-      \code{backend = "glmnet"}.}
+      \code{pvalue} is \code{NA} for \code{backend = "glmnet"};
+      \code{selection} is always available.}
   }
 }
 \description{
@@ -27,28 +27,46 @@ prediction stability.
 \details{
 Each component is mapped to \eqn{[0, 1]} as follows:
 \describe{
-  \item{Coefficient component}{
+  \item{Coefficient component (\eqn{C_\beta})}{
     \eqn{C_\beta = \frac{1}{p}\sum_{j=1}^{p}
     \exp\!\left(-S_{\beta,j} / (|\hat\beta_j^{(0)}| +
-    \varepsilon)\right)}. Relative variance drives the exponential decay.
+    \bar\beta)\right)}, where
+    \eqn{\bar\beta = \max(\mathrm{median}_j|\hat\beta_j^{(0)}|,\, 10^{-4})}
+    is a global scale reference.  This prevents the exponential from
+    collapsing to zero for weakly-identified (near-zero) predictors.
     Includes all model terms (intercept and predictors).}
-  \item{P-value component}{
+  \item{P-value component (\eqn{C_p})}{
     \eqn{C_p = \frac{1}{p'}\sum_{j \neq \text{intercept}} |2 S_{p,j} - 1|},
-    where \eqn{p'} is the number of predictor terms (intercept excluded).
-    Values near 0 or 1 (stable decisions) score high; 0.5 (random) scores
-    zero.}
-  \item{Selection component}{Same formula as p-value component, applied to
-    selection frequencies, excluding the intercept.}
-  \item{Prediction component}{
+    where \eqn{S_{p,j}} is the proportion of perturbation iterations in
+    which term \eqn{j} is significant at level \code{alpha} and \eqn{p'}
+    is the number of predictor terms.  Values near 0 or 1 (consistent
+    decisions) score high; 0.5 (random) scores zero.
+    \code{NA} for \code{backend = "glmnet"}.}
+  \item{Selection component (\eqn{C_\mathrm{sel}})}{
+    For \code{"lm"}, \code{"glm"}, \code{"rlm"}: the mean
+    \emph{sign consistency} across predictors — the proportion of
+    perturbation iterations in which each predictor's estimated sign
+    agrees with the base-fit sign.  Captures stability of effect direction,
+    which is distinct from significance stability (\eqn{C_p}).
+    For \code{"glmnet"}: the mean \emph{non-zero selection frequency} —
+    proportion of perturbation iterations in which each predictor's
+    coefficient is non-zero.  Always available (never \code{NA}).
+    Excludes the intercept.}
+  \item{Prediction component (\eqn{C_\mathrm{pred}})}{
     \eqn{C_\mathrm{pred} = \exp(-\bar S_\mathrm{pred} /
     (\mathrm{Var}(y) + \varepsilon))}.
     Prediction variance relative to outcome variance drives the decay.}
 }
 The RI is \eqn{100 \times (C_\beta + C_p + C_\mathrm{sel} +
-C_\mathrm{pred}) / 4}, where the mean is taken over available (non-NA)
-components.  For \code{backend = "glmnet"}, p-values are not defined so
-\eqn{C_p} and \eqn{C_\mathrm{sel}} are \code{NA} and the RI is based on
-the remaining two components.
+C_\mathrm{pred}) / k}, where \eqn{k} is the number of non-\code{NA}
+components.  For \code{backend = "glmnet"}, \eqn{C_p} is \code{NA} so
+the RI is based on three components (\eqn{k = 3}): \eqn{C_\beta},
+\eqn{C_\mathrm{sel}}, and \eqn{C_\mathrm{pred}}.  All other backends
+contribute all four components (\eqn{k = 4}).
+
+\strong{Comparability across backends:} because \code{"glmnet"} uses three
+components and \code{"lm"}/\code{"glm"}/\code{"rlm"} use four, RI values
+are not directly comparable across backends.
 }
 \examples{
 set.seed(1)

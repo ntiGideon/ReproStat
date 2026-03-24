@@ -4,4 +4,10 @@
 ^README\.Rmd$
 ^inst/scripts$
 ^inst/output$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^cran-comments\.md$
+^sample_runer\.R$
+^Rplots\.pdf$
 

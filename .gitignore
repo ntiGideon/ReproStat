@@ -1,0 +1,35 @@
+# R artifacts
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj.user/
+Rplots.pdf
+
+# Development / testing scripts
+sample_runer.R
+
+# Generated output directories
+inst/scripts/output/
+inst/output/
+
+# pkgdown website (generated, not source)
+docs/
+pkgdown/
+
+# devtools / roxygen2 build artifacts
+src/*.so
+src/*.dll
+src/Makevars
+
+# R check artefacts
+*.Rcheck/
+
+# vignette intermediate files
+vignettes/*.html
+vignettes/*.pdf
+vignettes/cache/
+vignettes/figure/
+
+# knitr cache
+*_cache/
+*_files/

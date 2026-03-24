@@ -21,6 +21,14 @@ A list with components:
 Computes the pointwise variance of predictions across perturbation
 iterations, and the mean of these variances as a scalar summary.
 }
+\details{
+By default predictions are made on the training data used to fit the base
+model.  For \code{method = "subsample"} this means the held-out rows
+receive genuine out-of-sample predictions, while for \code{method =
+"bootstrap"} the predictions are a mix of in-bag and out-of-bag.  Pass
+\code{predict_newdata} to \code{\link{run_diagnostics}} for a dedicated
+held-out evaluation set.
+}
 \examples{
 set.seed(1)
 d <- run_diagnostics(mpg ~ wt + hp, data = mtcars, B = 50)

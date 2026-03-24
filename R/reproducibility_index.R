@@ -7,28 +7,46 @@
 #' @details
 #' Each component is mapped to \eqn{[0, 1]} as follows:
 #' \describe{
-#'   \item{Coefficient component}{
+#'   \item{Coefficient component (\eqn{C_\beta})}{
 #'     \eqn{C_\beta = \frac{1}{p}\sum_{j=1}^{p}
 #'     \exp\!\left(-S_{\beta,j} / (|\hat\beta_j^{(0)}| +
-#'     \varepsilon)\right)}. Relative variance drives the exponential decay.
+#'     \bar\beta)\right)}, where
+#'     \eqn{\bar\beta = \max(\mathrm{median}_j|\hat\beta_j^{(0)}|,\, 10^{-4})}
+#'     is a global scale reference.  This prevents the exponential from
+#'     collapsing to zero for weakly-identified (near-zero) predictors.
 #'     Includes all model terms (intercept and predictors).}
-#'   \item{P-value component}{
+#'   \item{P-value component (\eqn{C_p})}{
 #'     \eqn{C_p = \frac{1}{p'}\sum_{j \neq \text{intercept}} |2 S_{p,j} - 1|},
-#'     where \eqn{p'} is the number of predictor terms (intercept excluded).
-#'     Values near 0 or 1 (stable decisions) score high; 0.5 (random) scores
-#'     zero.}
-#'   \item{Selection component}{Same formula as p-value component, applied to
-#'     selection frequencies, excluding the intercept.}
-#'   \item{Prediction component}{
+#'     where \eqn{S_{p,j}} is the proportion of perturbation iterations in
+#'     which term \eqn{j} is significant at level \code{alpha} and \eqn{p'}
+#'     is the number of predictor terms.  Values near 0 or 1 (consistent
+#'     decisions) score high; 0.5 (random) scores zero.
+#'     \code{NA} for \code{backend = "glmnet"}.}
+#'   \item{Selection component (\eqn{C_\mathrm{sel}})}{
+#'     For \code{"lm"}, \code{"glm"}, \code{"rlm"}: the mean
+#'     \emph{sign consistency} across predictors — the proportion of
+#'     perturbation iterations in which each predictor's estimated sign
+#'     agrees with the base-fit sign.  Captures stability of effect direction,
+#'     which is distinct from significance stability (\eqn{C_p}).
+#'     For \code{"glmnet"}: the mean \emph{non-zero selection frequency} —
+#'     proportion of perturbation iterations in which each predictor's
+#'     coefficient is non-zero.  Always available (never \code{NA}).
+#'     Excludes the intercept.}
+#'   \item{Prediction component (\eqn{C_\mathrm{pred}})}{
 #'     \eqn{C_\mathrm{pred} = \exp(-\bar S_\mathrm{pred} /
 #'     (\mathrm{Var}(y) + \varepsilon))}.
 #'     Prediction variance relative to outcome variance drives the decay.}
 #' }
 #' The RI is \eqn{100 \times (C_\beta + C_p + C_\mathrm{sel} +
-#' C_\mathrm{pred}) / 4}, where the mean is taken over available (non-NA)
-#' components.  For \code{backend = "glmnet"}, p-values are not defined so
-#' \eqn{C_p} and \eqn{C_\mathrm{sel}} are \code{NA} and the RI is based on
-#' the remaining two components.
+#' C_\mathrm{pred}) / k}, where \eqn{k} is the number of non-\code{NA}
+#' components.  For \code{backend = "glmnet"}, \eqn{C_p} is \code{NA} so
+#' the RI is based on three components (\eqn{k = 3}): \eqn{C_\beta},
+#' \eqn{C_\mathrm{sel}}, and \eqn{C_\mathrm{pred}}.  All other backends
+#' contribute all four components (\eqn{k = 4}).
+#'
+#' \strong{Comparability across backends:} because \code{"glmnet"} uses three
+#' components and \code{"lm"}/\code{"glm"}/\code{"rlm"} use four, RI values
+#' are not directly comparable across backends.
 #'
 #' @param diag_obj A \code{reprostat} object from \code{\link{run_diagnostics}}.
 #'
@@ -37,8 +55,8 @@
 #'     \item{\code{index}}{Scalar RI on a 0--100 scale.}
 #'     \item{\code{components}}{Named numeric vector with four sub-scores:
 #'       \code{coef}, \code{pvalue}, \code{selection}, \code{prediction}.
-#'       \code{pvalue} and \code{selection} are \code{NA} for
-#'       \code{backend = "glmnet"}.}
+#'       \code{pvalue} is \code{NA} for \code{backend = "glmnet"};
+#'       \code{selection} is always available.}
 #'   }
 #'
 #' @examples
@@ -46,7 +64,7 @@
 #' d <- run_diagnostics(mpg ~ wt + hp, data = mtcars, B = 50)
 #' reproducibility_index(d)
 #'
-#' @importFrom stats coef var
+#' @importFrom stats coef var median
 #' @export
 reproducibility_index <- function(diag_obj) {
   beta_var <- coef_stability(diag_obj)
@@ -64,26 +82,31 @@ reproducibility_index <- function(diag_obj) {
   base_coef <- abs(base_coef_raw)
   b_keep    <- intersect(names(beta_var), names(base_coef))
 
+  # c_beta: exponential decay of variance relative to coefficient magnitude.
+  # scale_ref (median |base_coef|) prevents collapse for near-zero coefficients.
+  scale_ref <- max(stats::median(base_coef[b_keep], na.rm = TRUE), 1e-4)
   c_beta <- mean(
-    exp(-beta_var[b_keep] / (base_coef[b_keep] + 1e-8)),
+    exp(-beta_var[b_keep] / (base_coef[b_keep] + scale_ref)),
     na.rm = TRUE
   )
 
-  # p-value and selection components: NA when p_mat is all NA (e.g. glmnet)
+  # c_p: stability of p-value significance decisions (NA for glmnet).
+  # Uses abs(2x - 1) so that both "always significant" and "always
+  # non-significant" score high; 0.5 (random) scores zero.
   p_available <- !all(is.na(diag_obj$p_mat))
-  if (p_available) {
-    p_sig    <- pvalue_stability(diag_obj)
-    sel_freq <- selection_stability(diag_obj)
-    # Exclude intercept from both c_p and c_sel for consistency
-    p_pred <- p_sig[setdiff(names(p_sig), "(Intercept)")]
-    c_p   <- mean(abs(2 * p_pred    - 1), na.rm = TRUE)
-    c_sel <- mean(abs(2 * sel_freq  - 1), na.rm = TRUE)
+  c_p <- if (p_available) {
+    p_sig <- pvalue_stability(diag_obj)   # excludes intercept
+    mean(abs(2 * p_sig - 1), na.rm = TRUE)
   } else {
-    c_p   <- NA_real_
-    c_sel <- NA_real_
+    NA_real_
   }
 
-  # Use stored y_train when available; fall back to model.response for lm/glm
+  # c_sel: sign consistency (lm/glm/rlm) or non-zero frequency (glmnet).
+  # This is genuinely distinct from c_p: it captures direction/selection
+  # stability rather than significance-decision stability.
+  c_sel <- mean(selection_stability(diag_obj), na.rm = TRUE)
+
+  # c_pred: prediction variance relative to outcome variance.
   y <- if (!is.null(diag_obj$y_train)) {
     diag_obj$y_train
   } else {
@@ -110,7 +133,9 @@ reproducibility_index <- function(diag_obj) {
 #'   Default is \code{0.95}.
 #' @param R Number of bootstrap resamples of the perturbation draws.
 #'   Default is \code{1000}. Values of 300--500 are sufficient for most uses.
-#' @param seed Integer random seed. Default is \code{20260307}.
+#' @param seed Integer random seed passed to \code{\link[base]{set.seed}}, or
+#'   \code{NULL} (default) to leave the global RNG state undisturbed.
+#'   Pass an integer for fully reproducible intervals.
 #'
 #' @return A named numeric vector of length 2 giving the lower and upper
 #'   quantile bounds of the RI bootstrap distribution.
@@ -118,13 +143,13 @@ reproducibility_index <- function(diag_obj) {
 #' @examples
 #' set.seed(1)
 #' d <- run_diagnostics(mpg ~ wt + hp, data = mtcars, B = 50)
-#' ri_confidence_interval(d, R = 200)
+#' ri_confidence_interval(d, R = 200, seed = 1)
 #'
 #' @importFrom stats quantile
 #' @export
 ri_confidence_interval <- function(diag_obj, level = 0.95, R = 1000L,
-                                   seed = 20260307L) {
-  set.seed(seed)
+                                   seed = NULL) {
+  if (!is.null(seed)) set.seed(seed)
   B    <- nrow(diag_obj$coef_mat)
   idx  <- numeric(R)
 

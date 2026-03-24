@@ -1,5 +1,0 @@
-"dataset","model","method","B","RI","CI_lower","CI_upper"
-"mtcars (lm)","mpg ~ wt+hp+disp","bootstrap",150,88.33,85.31,91.35
-"mtcars (glm)","am ~ wt+hp+qsec","bootstrap",150,74.76,74.04,75.73
-"iris","Sepal.Length ~ .","noise sd=0.03",150,99.98,99.98,99.98
-"airquality","Ozone ~ Solar.R+Wind+Temp","bootstrap",150,83.58,81.49,85.58
