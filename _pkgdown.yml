@@ -4,131 +4,133 @@ template:
   bootstrap: 5
   bootswatch: flatly
   bslib:
-    primary:        "#2C7FB8"
-    secondary:      "#1B9E77"
-    success:        "#41B6C4"
-    info:           "#7FCDBB"
-    base_font:      {google: "Inter"}
-    heading_font:   {google: "Inter"}
-    code_font:      {google: "Fira Code"}
-    border-radius:  "0.5rem"
+    primary: "#2C7FB8"
+    secondary: "#1B9E77"
+    success: "#41B6C4"
+    info: "#7FCDBB"
+    base_font: {google: "Inter"}
+    heading_font: {google: "Inter"}
+    code_font: {google: "Fira Code"}
+    border-radius: "0.5rem"
   includes:
     in_header: |
       <meta name="description"
-            content="ReproStat: R package for reproducibility diagnostics
-                     in statistical modeling.">
+            content="ReproStat is an R package for reproducibility diagnostics in statistical modeling, with perturbation-based stability metrics, a reproducibility index, and repeated CV ranking stability.">
 
 home:
-  title: "ReproStat — Reproducibility Diagnostics for Statistical Modeling"
+  title: "ReproStat - Reproducibility Diagnostics for Statistical Modeling"
   description: >
-    An R package that diagnoses how stable a statistical model's outputs are
-    under data perturbations. Computes coefficient, p-value, selection, and
-    prediction stability, plus a composite Reproducibility Index (0–100).
+    ReproStat helps analysts assess how stable model outputs remain under
+    bootstrap, subsampling, and noise perturbations. It provides
+    coefficient, p-value, selection, and prediction stability diagnostics,
+    a composite Reproducibility Index, and repeated CV ranking stability
+    for model comparison.
+  strip_header: false
   links:
     - text: "CRAN"
       href: https://cran.r-project.org/package=ReproStat
-    - text: "Report a bug"
+    - text: "GitHub"
+      href: https://github.com/ntiGideon/ReproStat
+    - text: "Report an issue"
       href: https://github.com/ntiGideon/ReproStat/issues
   sidebar:
-    structure: [links, license, community, citation, authors, dev]
+    structure: [links, license, citation, authors, dev]
 
 navbar:
   structure:
-    left:  [intro, articles, reference, news]
+    left: [get-started, articles, reference, news]
     right: [search, github]
   components:
-    intro:
-      text: "Get started"
+    get-started:
+      text: "Get Started"
       href: articles/ReproStat-intro.html
     articles:
-      text: Articles
+      text: "Articles"
       menu:
-        - text: "Introduction to ReproStat"
+        - text: "Introduction"
           href: articles/ReproStat-intro.html
-        - text: "─────────────────"
-        - text: "Backends"
-        - text: "Using lm and glm backends"
-          href: articles/ReproStat-intro.html#backends
-        - text: "Using rlm (robust regression)"
-          href: articles/ReproStat-intro.html#robust-regression
-        - text: "Using glmnet (LASSO / ridge)"
-          href: articles/ReproStat-intro.html#penalized-regression
+        - text: "Interpreting Outputs"
+          href: articles/interpreting-reprostat.html
+        - text: "Backend Guide"
+          href: articles/backend-guide.html
+        - text: "Workflow Patterns"
+          href: articles/workflow-patterns.html
     reference:
-      text: Reference
+      text: "Reference"
       href: reference/index.html
     news:
-      text: Changelog
+      text: "Changelog"
       href: news/index.html
     github:
       icon: fab fa-github
       href: https://github.com/ntiGideon/ReproStat
-      aria-label: GitHub
+      aria-label: "GitHub repository"
 
 reference:
-  - title: "Core workflow"
+  - title: "Start Here"
     desc: >
-      The main pipeline: perturb data → run diagnostics → extract metrics.
+      Core entry points for fitting diagnostics, summarizing them, and
+      understanding the package.
     contents:
+      - ReproStat-package
       - run_diagnostics
+      - print.reprostat
+
+  - title: "Data Perturbation"
+    desc: >
+      Functions for generating perturbed datasets and choosing a perturbation
+      design that matches the stability question you want to ask.
+    contents:
       - perturb_data
 
-  - title: "Stability metrics"
+  - title: "Stability Metrics"
     desc: >
-      Four metrics computed from a `reprostat` object returned by
-      `run_diagnostics()`. Each captures a different dimension of stability.
+      Component-level summaries of how coefficients, significance decisions,
+      predictor behavior, and predictions vary across perturbations.
     contents:
       - coef_stability
       - pvalue_stability
       - selection_stability
       - prediction_stability
 
-  - title: "Reproducibility Index"
+  - title: "Composite Summary"
     desc: >
-      Composite index (0–100) aggregating all four stability components,
-      plus a bootstrap confidence interval.
+      Aggregate the component diagnostics into a Reproducibility Index and
+      quantify uncertainty in that summary.
     contents:
       - reproducibility_index
       - ri_confidence_interval
 
-  - title: "Cross-validation ranking stability"
+  - title: "Model Comparison"
     desc: >
-      Compare multiple candidate models via repeated K-fold CV and assess
-      how consistently each model ranks as the best.
+      Repeated cross-validation tools for comparing candidate formulas by
+      ranking stability rather than average error alone.
     contents:
       - cv_ranking_stability
-
-  - title: "Visualisation"
-    desc: >
-      Base-graphics and ggplot2 plots for stability diagnostics and CV results.
-    contents:
-      - plot_stability
-      - plot_stability_gg
       - plot_cv_stability
       - plot_cv_stability_gg
 
-  - title: "S3 methods"
-    desc: "Methods for the `reprostat` S3 class."
+  - title: "Visualization"
+    desc: >
+      Plotting helpers for inspecting the stability structure of a fitted
+      ReproStat object.
     contents:
-      - print.reprostat
-
-  - title: "Package"
-    desc: "Package-level documentation."
-    contents:
-      - ReproStat-package
-
-footer:
-  structure:
-    left:  [package]
-    right: [developed_by, built_with]
-  components:
-    package: >
-      **ReproStat** is licensed under
-      [GPL (>= 3)](https://www.gnu.org/licenses/gpl-3.0.html).
+      - plot_stability
+      - plot_stability_gg
 
 news:
   releases:
     - text: "Version 0.1.0"
       href: https://github.com/ntiGideon/ReproStat/releases/tag/v0.1.0
+
+footer:
+  structure:
+    left: [package]
+    right: [developed_by, built_with]
+  components:
+    package: >
+      **ReproStat** is licensed under
+      [GPL (>= 3)](https://www.gnu.org/licenses/gpl-3.0.html).
 
 authors:
   "Gideon Nti Boateng":
