@@ -11,13 +11,13 @@ Source:
 [`DESCRIPTION`](https://github.com/ntiGideon/ReproStat/blob/master/DESCRIPTION)
 
 Nti Boateng G (2026). *ReproStat: Reproducibility Diagnostics for
-Statistical Modeling*. R package version 0.1.0,
+Statistical Modeling*. R package version 0.1.1,
 <https://ntiGideon.github.io/ReproStat>.
 
     @Manual{,
       title = {ReproStat: Reproducibility Diagnostics for Statistical Modeling},
       author = {Gideon {Nti Boateng}},
       year = {2026},
-      note = {R package version 0.1.0},
+      note = {R package version 0.1.1},
       url = {https://ntiGideon.github.io/ReproStat},
     }

@@ -3,7 +3,16 @@
 or the mean rank of each candidate model from a repeated cross-validation
 stability run."><meta property="og:description" content="Produces a ggplot2 horizontal bar chart of either the top-1 frequency
 or the mean rank of each candidate model from a repeated cross-validation
-stability run."><meta name="description" content="ReproStat is an R package for reproducibility diagnostics in statistical modeling, with perturbation-based stability metrics, a reproducibility index, and repeated CV ranking stability."></head><body>
+stability run."><meta name="description" content="ReproStat is an R package for reproducibility diagnostics
+      in statistical modeling. Quantify coefficient, p-value, selection,
+      and prediction stability under bootstrap, subsampling, and noise
+      perturbations, and summarise results with a 0–100 Reproducibility
+      Index."><meta name="keywords" content="reproducibility, statistical modeling, R package, stability
+      diagnostics, bootstrap, perturbation, reproducibility index,
+      coefficient stability, model comparison"><meta property="og:type" content="website"><meta property="og:title" content="ReproStat — Reproducibility Diagnostics for R"><meta property="og:description" content="Bootstrap, subsample, and noise-based stability diagnostics
+      for statistical models in R. Includes a composite Reproducibility
+      Index, CI estimation, repeated CV ranking stability, and four
+      modelling backends."><meta name="twitter:card" content="summary"><meta name="twitter:title" content="ReproStat — Reproducibility Diagnostics for R"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -11,7 +20,7 @@ stability run."><meta name="description" content="ReproStat is an R package for 
 
     <a class="navbar-brand me-2" href="../index.html">ReproStat</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -22,16 +31,18 @@ stability run."><meta name="description" content="ReproStat is an R package for 
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/ReproStat-intro.html">Get Started</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/ReproStat-intro.html">Introduction</a></li>
-    <li><a class="dropdown-item" href="../articles/interpreting-reprostat.html">Interpreting Outputs</a></li>
-    <li><a class="dropdown-item" href="../articles/backend-guide.html">Backend Guide</a></li>
-    <li><a class="dropdown-item" href="../articles/workflow-patterns.html">Workflow Patterns</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><h6 class="dropdown-header" data-toc-skip>─── Foundations ───────────────</h6></li>
+    <li><a class="dropdown-item" href="../articles/ReproStat-intro.html">Introduction &amp; Quick Start</a></li>
+    <li><a class="dropdown-item" href="../articles/interpreting-reprostat.html">Interpreting ReproStat Outputs</a></li>
+    <li><h6 class="dropdown-header" data-toc-skip>─── Going Deeper ───────────────</h6></li>
+    <li><a class="dropdown-item" href="../articles/backend-guide.html">Choosing a Modeling Backend</a></li>
+    <li><a class="dropdown-item" href="../articles/workflow-patterns.html">Practical Workflow Patterns</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/ntiGideon/ReproStat" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/ntiGideon/ReproStat" aria-label="View source on GitHub"><span class="fa fa-github"></span></a></li>
       </ul></div>
 
 
@@ -93,7 +104,7 @@ stability run.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p><strong>ReproStat</strong> is licensed under <a href="https://www.gnu.org/licenses/gpl-3.0.html" class="external-link">GPL (&gt;= 3)</a>.</p>
+  <p><strong>ReproStat</strong> is free software released under the <a href="https://www.gnu.org/licenses/gpl-3.0.html" class="external-link">GPL (≥ 3)</a> licence.</p>
 </div>
 
 <div class="pkgdown-footer-right">

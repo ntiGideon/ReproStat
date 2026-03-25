@@ -1,5 +1,27 @@
 # Changelog
 
+## ReproStat 0.1.1
+
+### CRAN resubmission — corrections requested by reviewers
+
+- **DESCRIPTION** — Description field now cites the three core methods
+  using the `authors (year) <doi:...>` format required by CRAN: Efron &
+  Tibshirani (1993, <ISBN:9780412042317>), Meinshausen & Bühlmann (2010)
+  `<doi:10.1111/j.1467-9868.2010.00740.x>`, and Peng (2011)
+  `<doi:10.1126/science.1213847>`.
+
+- **Examples** — `\dontrun{}` replaced with `\donttest{}` in
+  `plot_stability_gg.Rd` and `plot_cv_stability_gg.Rd`; optional-package
+  examples are now guarded with a
+  [`requireNamespace()`](https://rdrr.io/r/base/ns-load.html) check
+  inside `\donttest{}`.
+
+- **[`par()`](https://rdrr.io/r/graphics/par.html) save/restore** — all
+  calls to `par(mfrow = ...)` in `demo/reprostat.R` and
+  `vignettes/ReproStat-intro.Rmd` now follow the
+  `oldpar <- par(...); on.exit(par(oldpar))` pattern so that global
+  graphics settings are restored after each code block.
+
 ## ReproStat 0.1.0
 
 ### Initial release
