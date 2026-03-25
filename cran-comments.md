@@ -1,6 +1,7 @@
-## Resubmission
+## Resubmission (v0.1.1)
 
-This is a resubmission addressing all issues raised by the CRAN reviewer.  Changes since the previous submission:
+This is a resubmission of v0.1.0 addressing all issues raised by the CRAN
+reviewer.  Changes since the previous submission:
 
 1. **References added to DESCRIPTION** — the Description field now cites the
    three core methods using the required `authors (year) <doi:...>` format:
